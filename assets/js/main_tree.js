@@ -3,11 +3,6 @@
     
     let curMouseX = null;
     let curMouseY = null;
-
-    // canopy sampler
-    const canopyImg = document.querySelector("#canopy");
-    let canopyCanvas, canopyCtx;
-    prepareCanopySampler();
     
     const treeSection = document.querySelector(".tree");
     treeSection.onmousemove = handleMouseMove;
@@ -42,34 +37,6 @@
         treeCanopy.removeEventListener("click", handleCanopyClick);
         
         collapseCanopy();
-    }
-    
-    function prepareCanopySampler() {
-        canopyCanvas = document.createElement('canvas');
-        canopyCanvas.width = canopyImg.naturalWidth;
-        canopyCanvas.height = canopyImg.naturalHeight;
-        canopyCtx = canopyCanvas.getContext('2d');
-        canopyCtx.drawImage(canopyImg, 0, 0);
-    }
-    
-    function getOpaqueSpawnPoint(canopyBounds) {
-        const maxAttempts = 40;
-
-        for (let i = 0; i < maxAttempts; i++) {
-            const dispX = gsap.utils.random(0, canopyBounds.width);
-            const dispY = gsap.utils.random(0, canopyBounds.height);
-
-            // Convert displayed coords to the canvas's natural resolution
-            const nx = Math.floor(dispX * (canopyCanvas.width / canopyBounds.width));
-            const ny = Math.floor(dispY * (canopyCanvas.height / canopyBounds.height));
-
-            const alpha = canopyCtx.getImageData(nx, ny, 1, 1).data[3];
-            if (alpha > 10) { // small threshold avoids near-invisible edge pixels
-                return { x: dispX, y: dispY };
-            }
-        }
-        // fallback if we somehow keep missing
-        return { x: canopyBounds.width >> 1, y: canopyBounds.height >> 1};
     }
     
     function startTreeShake()
@@ -171,8 +138,9 @@
     }
     function spawnFallingPileLeaf() 
     {
-        const point = getOpaqueSpawnPoint(bounds);
-        const leaf = makeNewLeaf(point.x, point.y);
+        const startX = gsap.utils.random(bounds.width * 0.1, bounds.width * 0.9);
+        const startY = gsap.utils.random(bounds.height * 0.1, bounds.height * 0.6);
+        const leaf = makeNewLeaf(startX, startY);
         
         const tl = gsap.timeline({ delay: gsap.utils.random(0, 0.5) });
         tl.to(leaf, {

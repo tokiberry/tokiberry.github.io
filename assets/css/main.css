@@ -1259,7 +1259,10 @@ input, select, textarea {
 		background-image: -ms-radial-gradient(rgba(0, 0, 0, 0.25) 25%, rgba(0, 0, 0, 0) 55%);
 		background-image: radial-gradient(rgba(0, 0, 0, 0.25) 25%, rgba(0, 0, 0, 0) 55%);
 		max-width: 100%;
-		text-align: center;
+		/*
+		 * commented out because it was offsetting the x position of the leaf spawn
+			text-align: center;
+		*/
 	}
 
 		#header > * {
@@ -1290,6 +1293,7 @@ input, select, textarea {
 				display: none;
 			}
 
+/*
 		#header .logo {
 			width: 5.5rem;
 			height: 5.5rem;
@@ -1301,6 +1305,7 @@ input, select, textarea {
 			#header .logo .icon:before {
 				font-size: 2rem;
 			}
+*/
 
 		#header .content {
 			border-style: solid;
@@ -1320,13 +1325,13 @@ input, select, textarea {
 				-ms-transition-delay: 0.25s;
 				transition-delay: 0.25s;
 				padding: 3rem 2rem;
-				max-height: 40rem;
+				max-height: 50vh;
 				overflow: hidden;
 			}
 
-				#header .content .inner > :last-child {
-					margin-bottom: 0;
-				}
+			#header .content .inner > :last-child {
+				margin-bottom: 0;
+			}
 
 			#header .content p {
 				text-transform: uppercase;
@@ -1335,6 +1340,10 @@ input, select, textarea {
 				line-height: 2;
 			}
 
+		#header nav {
+			text-align: center;
+		}
+		
 		#header nav ul {
 			display: -moz-flex;
 			display: -webkit-flex;
@@ -1439,7 +1448,7 @@ input, select, textarea {
 					top: calc(-2rem - 1px);
 					height: calc(2rem + 1px);
 				}
-
+/*
 			#header .logo {
 				width: 4.75rem;
 				height: 4.75rem;
@@ -1449,7 +1458,7 @@ input, select, textarea {
 				#header .logo .icon:before {
 					font-size: 1.75rem;
 				}
-
+*/
 			#header .content .inner {
 				padding: 2.5rem 1rem;
 			}
@@ -1500,6 +1509,47 @@ input, select, textarea {
 				}
 
 		}
+
+/* Tree */
+	.tree {
+		position: relative;
+		width: 100%;
+		height: 45vh;
+		aspect-ratio: 9 / 10;
+	}
+	
+	.tree img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+	
+	#canopy {
+		z-index: 3;
+	}
+	
+	#canopy-leaves {
+		pointer-events: none;
+		z-index: 4;
+	}
+	
+	#leaf-stage {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: 2;
+	}
+	
+	.leaf {
+		position: absolute;
+		will-change: transform;
+		pointer-events: none;
+	}
 
 /* Main */
 

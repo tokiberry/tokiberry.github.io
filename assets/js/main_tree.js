@@ -68,9 +68,22 @@
         gsap.killTweensOf("#canopy");
     }
     
+    function getCanopySpawnPoint(canopyBounds, insetX = 0.9, insetY = 0.6)
+    {
+        const rx = (canopyBounds.width >> 1) * insetX;
+        const ry = (canopyBounds.height >> 1) * insetY;
+        const cx = canopyBounds.width >> 1;
+        const cy = canopyBounds.height >> 1;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.sqrt(Math.random());
+        const x = cx + r * rx * Math.cos(angle);
+        const y = cy + r * ry * Math.sin(angle);
+        
+        return {x, y};
+    }
     // Colors used for the leaf svg instances
     const leafPalette = ['#4a7c3f', '#6fa84f', '#8fbf5a', '#c9de7c', '#e8d878'];
-
     function leafSVG(color) 
     {
         return `
@@ -92,8 +105,8 @@
         leafElem.innerHTML = leafSVG(color);
 
         const size = gsap.utils.random(16, 30);
-        leafElem.style.width = size + 'px';
-        leafElem.style.height = size + 'px';
+        leafElem.style.width = size + "px";
+        leafElem.style.height = size + "px";
 
         gsap.set(leafElem, { x: startX, y: startY, rotation: gsap.utils.random(0, 360) });
         stage.appendChild(leafElem);
@@ -122,13 +135,13 @@
         tl.to(leaf, {
             y: bounds.height + 40,
             duration: fallDuration,
-            ease: 'power1.in'
+            ease: "power1.in"
         }, 0);
 
         tl.to(leaf, {
             x: `+=${driftDistance}`,
             duration: fallDuration / (swayCount + 1),
-            ease: 'sine.inOut',
+            ease: "sine.inOut",
             repeat: swayCount,
             yoyo: true
         }, 0);
@@ -136,7 +149,7 @@
         tl.to(leaf, {
             rotation: `+=${rotations * 360}`,
             duration: fallDuration,
-            ease: 'none'
+            ease: "none"
         }, 0);
 
         tl.to(leaf, {
@@ -147,9 +160,8 @@
     function spawnFallingPileLeaf() 
     {
         const bounds = treeSection.getBoundingClientRect();
-        const startX = gsap.utils.random(bounds.width * 0.1, bounds.width * 0.9);
-        const startY = gsap.utils.random(bounds.height * 0.1, bounds.height * 0.6);
-        const leaf = makeNewLeaf(startX, startY);
+        const spawnPoint = getCanopySpawnPoint(bounds);
+        const leaf = makeNewLeaf(spawnPoint.x, spawnPoint.y);
         
         const tl = gsap.timeline({ delay: gsap.utils.random(0, 0.5) });
         tl.to(leaf, {
@@ -161,9 +173,9 @@
         
         // small settle bounce once it "lands"
         .to(leaf, {
-            x: `+=${gsap.utils.random(-20, 20)}`,
-            duration: 0.25,
-            ease: 'power1.out'
+            x: `+=${gsap.utils.random(-15, 15)}`,
+            duration: 0.2,
+            ease: "power1.out"
         });
         
         return leaf;
@@ -238,12 +250,12 @@
             .to(flowerElem, {
                 scale: 1,
                 duration: 0.5,
-                ease: 'back.out(2.5)' // slight overshoot pop, like it's springing up from the ground
+                ease: "back.out(2.5)"
             })
             .to(flowerElem, {
                 rotation: `+=${gsap.utils.random(-4, 4)}`,
                 duration: 1.2,
-                ease: 'sine.inOut',
+                ease: "sine.inOut",
                 repeat: -1,
                 yoyo: true
             });

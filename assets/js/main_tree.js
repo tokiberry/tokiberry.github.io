@@ -80,9 +80,7 @@
             </svg>
         `;
     }
-
-    const bounds = treeSection.getBoundingClientRect();
-    const maxYSpawn = bounds.height * 0.5;
+    
     const stage = document.getElementById("leaf-stage");
     
     function makeNewLeaf(startX, startY)
@@ -105,6 +103,8 @@
     
     function spawnFallingLeaf()
     {
+        const bounds = treeSection.getBoundingClientRect();
+        const maxYSpawn = bounds.height * 0.5;
         const startX = curMouseX != null ? curMouseX : gsap.utils.random(0, bounds.width);
         const startY = curMouseY > maxYSpawn ? maxYSpawn : curMouseY;
         const leaf = makeNewLeaf(startX, startY);
@@ -146,6 +146,7 @@
     }
     function spawnFallingPileLeaf() 
     {
+        const bounds = treeSection.getBoundingClientRect();
         const startX = gsap.utils.random(bounds.width * 0.1, bounds.width * 0.9);
         const startY = gsap.utils.random(bounds.height * 0.1, bounds.height * 0.6);
         const leaf = makeNewLeaf(startX, startY);
@@ -218,6 +219,7 @@
     }
     function spawnFlower()
     {
+        const bounds = treeSection.getBoundingClientRect();
         const spawnX = (bounds.width >> 1) + gsap.utils.random(-100, 100);
         const flowerElem = document.createElement("div");
         flowerElem.className = "flower";

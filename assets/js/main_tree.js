@@ -1,6 +1,6 @@
 ﻿(function($) {
     let bShakeTreeEnabled = false;
-    
+    let leafPile = [];
     let curMouseX = null;
     let curMouseY = null;
     
@@ -16,9 +16,16 @@
     
     const treeCanopy = document.getElementById("canopy");
     const treeCanopyLeaves = document.getElementById("canopy-leaves");
-    treeCanopy.addEventListener("mouseenter", handleCanopyMouseEnter);
-    treeCanopy.addEventListener("mouseleave", handleCanopyMouseLeave);
-    treeCanopy.addEventListener( "click", handleCanopyClick);
+    function addCanopyListeners()
+    {
+        treeCanopy.style.pointerEvents = "auto";
+        
+        treeCanopy.addEventListener("mouseenter", handleCanopyMouseEnter);
+        treeCanopy.addEventListener("mouseleave", handleCanopyMouseLeave);
+        treeCanopy.addEventListener( "click", handleCanopyClick);
+    }
+    
+    addCanopyListeners();
     
     function handleCanopyMouseEnter()
     {
@@ -36,6 +43,7 @@
         treeCanopy.removeEventListener("mouseleave", handleCanopyMouseLeave);
         treeCanopy.removeEventListener("click", handleCanopyClick);
         
+        treeCanopy.style.pointerEvents = "none";
         collapseCanopy();
     }
     
@@ -144,7 +152,6 @@
         
         const tl = gsap.timeline({ delay: gsap.utils.random(0, 0.5) });
         tl.to(leaf, {
-            //x: bounds.width >> 1,
             y: bounds.height * 0.95 + gsap.utils.random(-6, 6),
             rotation: `+=${gsap.utils.random(180, 540) * (Math.random() < 0.5 ? -1 : 1)}`,
             duration: gsap.utils.random(0.7, 1.3),
@@ -157,6 +164,8 @@
             duration: 0.25,
             ease: 'power1.out'
         });
+        
+        return leaf;
     }
 
     function loopSpawn() {
@@ -175,7 +184,7 @@
         const leafCount = 100;
         for (let i = 0; i < leafCount; ++i)
         {
-            spawnFallingPileLeaf();
+            leafPile.push(spawnFallingPileLeaf());
         }
         
         gsap.to([treeCanopy, treeCanopyLeaves], {
@@ -185,7 +194,90 @@
             transformOrigin: '50% 100%',
             duration: 0.5,
             ease: "power3.in",
-        });       
+        });
+        
+        gsap.delayedCall(1.6, () => spawnFlower());
+    }
+
+    const flowerPalette = ['#e8879e', '#5e0913', '#f4f1de', '#c86b98'];
+    function flowerSVG(color) 
+    {
+        return `
+            <svg width="20" height="34" viewBox="0 0 20 34" xmlns="http://www.w3.org/2000/svg">
+              <line x1="10" y1="12" x2="10" y2="34" stroke="#4a7c3f" stroke-width="2" stroke-linecap="round"/>
+              <path d="M10 34 Q4 30 6 24" stroke="#4a7c3f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <g fill="${color}">
+                <ellipse cx="10" cy="5" rx="3.4" ry="4.4"/>
+                <ellipse cx="15" cy="10" rx="4.4" ry="3.4"/>
+                <ellipse cx="10" cy="15" rx="3.4" ry="4.4"/>
+                <ellipse cx="5" cy="10" rx="4.4" ry="3.4"/>
+              </g>
+              <circle cx="10" cy="10" r="2.6" fill="#f2c14e"/>
+            </svg>
+          `;
+    }
+    function spawnFlower()
+    {
+        const spawnX = (bounds.width >> 1) + gsap.utils.random(-100, 100);
+        const flowerElem = document.createElement("div");
+        flowerElem.className = "flower";
+
+        const color = flowerPalette[Math.floor(Math.random() * flowerPalette.length)];
+        flowerElem.innerHTML = flowerSVG(color);
+
+        const size = 64;
+        flowerElem.style.width = (size * 20 / 34) + "px";
+        flowerElem.style.height = size + "px";
+
+        gsap.set(flowerElem, { x: spawnX, scale: 0, rotation: gsap.utils.random(-8, 8) });
+        stage.appendChild(flowerElem);
+
+        gsap.timeline()
+            .to(flowerElem, {
+                scale: 1,
+                duration: 0.5,
+                ease: 'back.out(2.5)' // slight overshoot pop, like it's springing up from the ground
+            })
+            .to(flowerElem, {
+                rotation: `+=${gsap.utils.random(-4, 4)}`,
+                duration: 1.2,
+                ease: 'sine.inOut',
+                repeat: -1,
+                yoyo: true
+            });
+        
+        flowerElem.addEventListener("click", (event)=>{
+            handleFlowerClick(flowerElem);
+        });
+    }
+    
+    function handleFlowerClick(inFlower)
+    {
+        inFlower.removeEventListener("click", handleFlowerClick);
+        inFlower.remove();
+        
+        // remove leaf pile
+        while (leafPile.length > 0)
+        {
+            let curLeaf = leafPile.pop();
+            curLeaf.remove();
+        }
+        
+        restoreCanopy();
+    }
+    
+    function restoreCanopy()
+    {
+        gsap.to([treeCanopy, treeCanopyLeaves], {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            transformOrigin: '50% 100%',
+            duration: 0.1,
+            ease: "power3.in",
+        });
+        
+        addCanopyListeners();
     }
     
 })(jQuery);
